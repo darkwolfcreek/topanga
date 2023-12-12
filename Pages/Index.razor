@@ -1,0 +1,129 @@
+﻿@page "/"
+
+<PageTitle>Tone Generator</PageTitle>
+
+<div class="container mt-4">
+    <h1>Tone Generator</h1>
+    <p>Adjust the settings and generate tones.</p>
+
+    <div class="form-group">
+        <label for="frequencySlider">Frequency (Hz)</label>
+        <input type="range" class="form-control-range" id="frequencySlider" min="20" max="20000" @bind="frequency">
+    </div>
+
+    <div class="form-group">
+        <label for="volumeSlider">Volume</label>
+        <input type="range" class="form-control-range" id="volumeSlider" min="0" max="1" step="0.01" @bind="volume" @oninput="AdjustVolume">
+    </div>
+
+    <div class="form-group">
+        <label for="oscillatorType">Oscillator Type</label>
+        <select @bind="oscillatorType" class="form-control">
+            <option value="sine">Sine</option>
+            <option value="square">Square</option>
+            <option value="sawtooth">Sawtooth</option>
+            <option value="triangle">Triangle</option>
+        </select>
+    </div>
+
+    <div>
+        @foreach (var note in noteFrequencies)
+        {
+            <button class="btn @(currentlyPlayingNote?.Frequency == note.Frequency ? "btn-danger" : "btn-secondary") m-1"
+                    @onclick="() => PlayNote(note)">
+                @note.Name
+            </button>
+        }
+    </div>
+
+    @if (currentlyPlayingNote == null)
+    {
+        <button class="btn btn-primary" @onclick="StartTone">Start Tone</button>
+    }
+    else
+    {
+        <button class="btn btn-danger" @onclick="StopTone">Stop Tone</button>
+    }
+</div>
+
+@code {
+    @inject IJSRuntime JSRuntime
+    private Note? currentlyPlayingNote = null;
+
+    private double frequency = 440;
+    private double volume = 0.5;
+    private string oscillatorType = "sine";
+    private bool isTonePlaying = false;
+    private List<Note> noteFrequencies;
+    private int octaveCount = 11;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        GenerateNoteFrequencies();
+    }
+
+    private void GenerateNoteFrequencies()
+    {
+        noteFrequencies = NoteGenerator.GenerateNotes(octaveCount);
+    }
+
+    public class Note
+    {
+        public string Name { get; set; }
+        public double Frequency { get; set; }
+    }
+
+    public static class NoteGenerator
+    {
+        public static List<Note> GenerateNotes(int octaveCount)
+        {
+            var notes = new List<Note>();
+            double a4Frequency = 440.0;
+            string[] noteNames = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+
+            for (int octave = 0; octave < octaveCount; octave++)
+            {
+                for (int i = 0; i < noteNames.Length; i++)
+                {
+                    double frequency = a4Frequency * Math.Pow(2, octave - 4 + (i - 9) / 12.0);
+                    notes.Add(new Note { Name = noteNames[i] + octave, Frequency = frequency });
+                }
+            }
+
+            return notes;
+        }
+    }
+
+    private async Task PlayNote(Note note)
+    {
+        if (currentlyPlayingNote != null && currentlyPlayingNote.Frequency != note.Frequency)
+        {
+            await StopTone();
+        }
+
+        await JSRuntime.InvokeVoidAsync("playTone", note.Frequency, oscillatorType);
+        currentlyPlayingNote = note;
+    }
+
+    private async Task StartTone()
+    {
+
+        if (currentlyPlayingNote == null || currentlyPlayingNote.Frequency != frequency)
+        {
+            currentlyPlayingNote = new Note { Frequency = frequency, Name = $"Custom ({frequency} Hz)" };
+            await JSRuntime.InvokeVoidAsync("playTone", frequency, oscillatorType);
+        }
+    }
+
+    private async Task StopTone()
+    {
+        await JSRuntime.InvokeVoidAsync("stopTone");
+        currentlyPlayingNote = null;
+    }
+
+    private async Task AdjustVolume()
+    {
+        await JSRuntime.InvokeVoidAsync("adjustVolume", volume);
+    }
+}
