@@ -45,23 +45,127 @@
     @if (currentlyPlayingNote == null)
     {
         <button class="btn btn-primary" @onclick="StartTone">Start Tone</button>
+
+        <button class="btn btn-primary" @onclick="PlayMidi">Play MIDI</button>
+
     }
     else
     {
         <button class="btn btn-danger" @onclick="StopTone">Stop Tone</button>
     }
+
+    <div class="row">
+        <div class="col" style="overflow-x: auto; height: 600px;" id="pianoRoll">
+            <div class="row no-gutters">
+                <div class="col-md-2" style="float: left;">
+                    @foreach (var note in noteFrequencies)
+                    {
+                        <div class="py-1 text-center" style="height: 20px;">
+                            @note.Name
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-10" style="float: left;">
+                    @foreach (var note in noteFrequencies)
+                    {
+                        <div class="border-bottom" style="height: 20px; position: relative;">
+                            @foreach (var midiNote in midiNotes)
+                            {
+                                @if (NoteMatches(midiNote, note))
+                                {
+                                    <div style="position: absolute; left: @GetNoteStartPosition(midiNote); width: @GetNoteWidth(midiNote); height: 100%; background-color: #90EE90;"></div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="zoomSlider">Zoom</label>
+        <input type="range" class="form-control-range" id="zoomSlider" min="0.5" max="3" step="0.1" @bind="zoomLevel">
+    </div>
+
+
 </div>
 
 @code {
+    private List<NoteData> midiNotes;
+    private bool isPlaying = false;
+    @inject MidiFileService MidiService
     @using Melanchall.DryWetMidi.Core;
     @using Melanchall.DryWetMidi.Interaction;
     @using System;
     @using System.Collections.Generic;
+    private double zoomLevel = 1.0;
+
+    private bool NoteMatches(NoteData midiNote, Note pianoNote)
+    {
+        int midiNoteNumber = NoteNameToMidiNumber(pianoNote.Name);
+        return midiNote.NoteNumber == midiNoteNumber;
+    }
+
+    private int NoteNameToMidiNumber(string noteName)
+    {
+        var noteOffsets = new Dictionary<string, int>
+    {
+        {"C", 0}, {"C#", 1}, {"D", 2}, {"D#", 3}, {"E", 4},
+        {"F", 5}, {"F#", 6}, {"G", 7}, {"G#", 8}, {"A", 9},
+        {"A#", 10}, {"B", 11}
+    };
+
+        int octave;
+        string note;
+
+        if (noteName[1] == '#' || noteName[1] == 'b')
+        {
+            note = noteName.Substring(0, 2);
+            octave = int.Parse(noteName.Substring(2));
+        }
+        else
+        {
+            note = noteName.Substring(0, 1);
+            octave = int.Parse(noteName.Substring(1));
+        }
+
+        int offset = noteOffsets[note] + octave * 12;
+        return offset;
+    }
+
+    private string GetNoteStartPosition(NoteData midiNote)
+    {
+        return $"{midiNote.StartTime * 50}px";
+    }
+
+    private string GetNoteWidth(NoteData midiNote)
+    {
+        return $"{midiNote.Duration * 50 * zoomLevel}px";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        midiNotes = MidiService.LoadAndParseMidiFile();
+    }
+
+    private async Task PlayMidi()
+    {
+        if (isPlaying) return;
+
+        isPlaying = true;
+        foreach (var note in midiNotes)
+        {
+            await JSRuntime.InvokeVoidAsync("playTone", note.Frequency, oscillatorType, volume, 0);
+            await Task.Delay(TimeSpan.FromSeconds(note.Duration));
+        }
+        isPlaying = false;
+    }
 
     public class MidiParser
     {
         private readonly IWebHostEnvironment _env;
-        public int BPM { get; set; } = 120;
+        public int BPM { get; set; } = 250;
 
         public MidiParser(IWebHostEnvironment env)
         {
@@ -70,7 +174,7 @@
 
         public List<NoteData> ParseMidiFile()
         {
-            string filePath = Path.Combine(_env.WebRootPath, "joji.mid");
+            string filePath = Path.Combine(_env.WebRootPath, "topanga.mid");
             var midiFile = MidiFile.Read(filePath);
             var tempoMap = midiFile.GetTempoMap();
             var notes = midiFile.GetNotes();
@@ -109,8 +213,10 @@
 
     public class NoteData
     {
+        public int NoteNumber { get; set; }
         public double Frequency { get; set; }
         public double Duration { get; set; }
+        public double StartTime { get; set; }
     }
 
     public class MidiFileService
@@ -129,6 +235,7 @@
             var noteDataList = _midiParser.ParseMidiFile();
             return noteDataList;
         }
+
     }
 
     private double impulseFrequency = 0;
@@ -190,7 +297,7 @@
             await StopTone();
         }
 
-        await JSRuntime.InvokeVoidAsync("playTone", note.Frequency, oscillatorType, volume, impulseFrequency);
+        await JSRuntime.InvokeVoidAsync("playTone", note.Frequency, oscillatorType, volume, 0);
         currentlyPlayingNote = note;
     }
 

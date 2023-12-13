@@ -10,9 +10,8 @@ async function playTone(frequency, oscillatorType, volume, impulseFrequency) {
     if (audioContext.state === 'suspended') {
         audioContext.resume();
     }
-
     if (isTonePlaying) {
-        stopToneSync();
+        await stopTone();
     }
 
     var oscillator = audioContext.createOscillator();
@@ -78,8 +77,14 @@ function startImpulseTrain(impulseFrequency, gainNode, volume) {
 }
 
 async function playMidiSequence(notes, oscillatorType, volume) {
+    const pianoRoll = document.getElementById('pianoRoll');
+
     for (let note of notes) {
         playTone(note.frequency, oscillatorType, volume, 0);
+
+        const notePosition = note.startTime * 50;
+        pianoRoll.scrollLeft = notePosition;
+
         await new Promise(resolve => setTimeout(resolve, note.duration * 1000));
         stopTone();
     }

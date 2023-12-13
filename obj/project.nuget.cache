@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uNSWdoUthTUS99zA2q88W8JhKSzpEcHcT7M+rhWliMAkQVh+sGHxScXfNCwcf7QyzPobY3K2KDbuFV/O1b1tXw==",
+  "dgSpecHash": "wtKfbIDx29PN3IR0V4O4UVk/fK8HrP2AesJlbANUdK7as3RQl11dIIzz+XkGfCevn3RKQtzl+pzXT+ShAcvtpA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\guam\\source\\repos\\BlazorApp1\\BlazorApp1\\BlazorApp1.csproj",
+  "projectFilePath": "C:\\Users\\guam\\Documents\\GitHub\\tonegenerator\\BlazorApp1.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\guam\\.nuget\\packages\\melanchall.drywetmidi\\7.0.1\\melanchall.drywetmidi.7.0.1.nupkg.sha512"
   ],
