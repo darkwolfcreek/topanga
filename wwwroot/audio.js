@@ -90,7 +90,25 @@ async function playMidiSequence(notes, oscillatorType, volume) {
     }
 }
 
+
 window.playMidiSequence = playMidiSequence;
+
+function setInitialScrollPosition(position) {
+    var pianoRoll = document.querySelector('.col-md-10');
+    if (pianoRoll) {
+        console.log("Setting scroll position to:", position);
+        pianoRoll.scrollTop = position;
+    }
+}
+
+function syncScroll(leftPanelId, rightPanelId) {
+    var leftPanel = document.getElementById(leftPanelId);
+    var rightPanel = document.getElementById(rightPanelId);
+
+    rightPanel.addEventListener('scroll', function () {
+        leftPanel.scrollTop = this.scrollTop;
+    });
+}
 
 function adjustVolume(volume) {
     if (currentGainNode) {
