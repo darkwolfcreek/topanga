@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "U9lACCUw0fFc8aAkWn5u0/Y/zwlr4UZqrnpCx7RD+HUUcEqfgxZxwGDhK84XveY95m8+GXylH9aNPSBw349ilw==",
+  "dgSpecHash": "uNSWdoUthTUS99zA2q88W8JhKSzpEcHcT7M+rhWliMAkQVh+sGHxScXfNCwcf7QyzPobY3K2KDbuFV/O1b1tXw==",
   "success": true,
   "projectFilePath": "C:\\Users\\guam\\source\\repos\\BlazorApp1\\BlazorApp1\\BlazorApp1.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\guam\\.nuget\\packages\\melanchall.drywetmidi\\7.0.1\\melanchall.drywetmidi.7.0.1.nupkg.sha512"
+  ],
   "logs": []
 }

@@ -26,6 +26,12 @@
         </select>
     </div>
 
+    <div class="form-group">
+        <label for="impulseFrequencySlider">Impulse Frequency (Hz)</label>
+        <input type="range" class="form-control-range" id="impulseFrequencySlider" min="0" max="100" step="0.1" @bind="impulseFrequency">
+        <p>Current: @impulseFrequency Hz</p>
+    </div>
+
     <div>
         @foreach (var note in noteFrequencies)
         {
@@ -47,9 +53,87 @@
 </div>
 
 @code {
+    @using Melanchall.DryWetMidi.Core;
+    @using Melanchall.DryWetMidi.Interaction;
+    @using System;
+    @using System.Collections.Generic;
+
+    public class MidiParser
+    {
+        private readonly IWebHostEnvironment _env;
+        public int BPM { get; set; } = 120;
+
+        public MidiParser(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
+
+        public List<NoteData> ParseMidiFile()
+        {
+            string filePath = Path.Combine(_env.WebRootPath, "joji.mid");
+            var midiFile = MidiFile.Read(filePath);
+            var tempoMap = midiFile.GetTempoMap();
+            var notes = midiFile.GetNotes();
+            var noteDataList = new List<NoteData>();
+
+            foreach (var note in notes)
+            {
+                double frequency = ConvertMidiNoteToFrequency(note.NoteNumber);
+                var metricTimeSpan = note.LengthAs<MetricTimeSpan>(tempoMap);
+                double durationInSeconds = CalculateNoteDuration(metricTimeSpan, BPM);
+
+                noteDataList.Add(new NoteData
+                    {
+                        Frequency = frequency,
+                        Duration = durationInSeconds
+                    });
+
+                Console.WriteLine($"Note: {note.NoteName}, Frequency: {frequency}, Duration: {durationInSeconds}s");
+            }
+
+            return noteDataList;
+        }
+
+        private static double ConvertMidiNoteToFrequency(int noteNumber)
+        {
+            return 440.0 * Math.Pow(2, (noteNumber - 69) / 12.0);
+        }
+
+        private double CalculateNoteDuration(MetricTimeSpan timeSpan, int bpm)
+        {
+            double beatDurationInSeconds = 60.0 / bpm;
+            double totalBeats = timeSpan.TotalMicroseconds / 1000000.0 / beatDurationInSeconds;
+            return totalBeats * beatDurationInSeconds;
+        }
+    }
+
+    public class NoteData
+    {
+        public double Frequency { get; set; }
+        public double Duration { get; set; }
+    }
+
+    public class MidiFileService
+    {
+        private readonly IWebHostEnvironment _env;
+        private readonly MidiParser _midiParser;
+
+        public MidiFileService(IWebHostEnvironment env)
+        {
+            _env = env;
+            _midiParser = new MidiParser(_env);
+        }
+
+        public List<NoteData> LoadAndParseMidiFile()
+        {
+            var noteDataList = _midiParser.ParseMidiFile();
+            return noteDataList;
+        }
+    }
+
+    private double impulseFrequency = 0;
     @inject IJSRuntime JSRuntime
     private Note? currentlyPlayingNote = null;
-
     private double frequency = 440;
     private double volume = 0.5;
     private string oscillatorType = "sine";
@@ -97,22 +181,25 @@
 
     private async Task PlayNote(Note note)
     {
-        if (currentlyPlayingNote != null && currentlyPlayingNote.Frequency != note.Frequency)
+        if (currentlyPlayingNote != null && currentlyPlayingNote.Frequency == note.Frequency)
+        {
+            await StopTone();
+        }
+        else if (currentlyPlayingNote != null)
         {
             await StopTone();
         }
 
-        await JSRuntime.InvokeVoidAsync("playTone", note.Frequency, oscillatorType);
+        await JSRuntime.InvokeVoidAsync("playTone", note.Frequency, oscillatorType, volume, impulseFrequency);
         currentlyPlayingNote = note;
     }
 
     private async Task StartTone()
     {
-
         if (currentlyPlayingNote == null || currentlyPlayingNote.Frequency != frequency)
         {
             currentlyPlayingNote = new Note { Frequency = frequency, Name = $"Custom ({frequency} Hz)" };
-            await JSRuntime.InvokeVoidAsync("playTone", frequency, oscillatorType);
+            await JSRuntime.InvokeVoidAsync("playTone", frequency, oscillatorType, volume, impulseFrequency);
         }
     }
 

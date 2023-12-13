@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "sJnmKVEP5utmentBczWcU/x+z0BUFM6onUpH3fi8xP4=",
+  "Hash": "JgHOUoJGQFC3yqFMoSgur2YNrv2/hXirx0Ui3pPMaw8=",
   "Source": "BlazorApp1",
   "BasePath": "_content/BlazorApp1",
   "Mode": "Default",
@@ -319,6 +319,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.png"
+    },
+    {
+      "Identity": "C:\\Users\\guam\\source\\repos\\BlazorApp1\\BlazorApp1\\wwwroot\\joji.mid",
+      "SourceId": "BlazorApp1",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\guam\\source\\repos\\BlazorApp1\\BlazorApp1\\wwwroot\\",
+      "BasePath": "_content/BlazorApp1",
+      "RelativePath": "joji.mid",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\joji.mid"
     }
   ]
 }

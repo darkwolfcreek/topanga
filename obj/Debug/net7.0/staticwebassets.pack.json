@@ -61,6 +61,10 @@
       "PackagePath": "staticwebassets\\favicon.png"
     },
     {
+      "Id": "C:\\Users\\guam\\source\\repos\\BlazorApp1\\BlazorApp1\\wwwroot\\joji.mid",
+      "PackagePath": "staticwebassets\\joji.mid"
+    },
+    {
       "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.BlazorApp1.Microsoft.AspNetCore.StaticWebAssets.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
     },

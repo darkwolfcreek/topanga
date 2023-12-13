@@ -1,11 +1,52 @@
 {
   "version": 3,
   "targets": {
-    "net7.0": {}
+    "net7.0": {
+      "Melanchall.DryWetMidi/7.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Melanchall.DryWetMidi.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/netstandard2.0/Melanchall.DryWetMidi.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "build/Melanchall.DryWetMidi.targets": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "Melanchall.DryWetMidi/7.0.1": {
+      "sha512": "G2AbZNuiTtEG9QIboPpbQK7Mkspm4LsEDpmIHWkzVWFilYhGUAcbBCwF7QDqlKUjmUc+X/jB1g0YwG1fa7pgMQ==",
+      "type": "package",
+      "path": "melanchall.drywetmidi/7.0.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "build/Melanchall.DryWetMidi.targets",
+        "build/Melanchall_DryWetMidi_Native32.dll",
+        "build/Melanchall_DryWetMidi_Native64.dll",
+        "build/Melanchall_DryWetMidi_Native64.dylib",
+        "icon.png",
+        "lib/net45/Melanchall.DryWetMidi.dll",
+        "lib/net45/Melanchall.DryWetMidi.xml",
+        "lib/netstandard2.0/Melanchall.DryWetMidi.dll",
+        "lib/netstandard2.0/Melanchall.DryWetMidi.xml",
+        "melanchall.drywetmidi.7.0.1.nupkg.sha512",
+        "melanchall.drywetmidi.nuspec"
+      ]
+    }
+  },
   "projectFileDependencyGroups": {
-    "net7.0": []
+    "net7.0": [
+      "Melanchall.DryWetMidi >= 7.0.1"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\guam\\.nuget\\packages\\": {},
@@ -50,6 +91,12 @@
     "frameworks": {
       "net7.0": {
         "targetAlias": "net7.0",
+        "dependencies": {
+          "Melanchall.DryWetMidi": {
+            "target": "Package",
+            "version": "[7.0.1, )"
+          }
+        },
         "imports": [
           "net461",
           "net462",

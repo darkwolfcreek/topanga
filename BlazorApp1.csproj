@@ -10,4 +10,8 @@
     <None Include="wwwroot\audio.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Melanchall.DryWetMidi" Version="7.0.1" />
+  </ItemGroup>
+
 </Project>
