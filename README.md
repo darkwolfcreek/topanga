@@ -1,4 +1,4 @@
-# Tone Generator
+# Topanga
 
 ## Overview
 The Tone Generator is a web-based application that allows users to generate and manipulate tones using various settings. It's built using [technologies/frameworks used, e.g., Blazor, JavaScript], and offers a range of functionalities from frequency adjustments to playing MIDI sequences.
